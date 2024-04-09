@@ -9,8 +9,7 @@ Servo servo4;
 // Switches Declaration
 int switch1Pin = 2;  // Switch connected to digital pin 2
 int switch2Pin = 3;  // Switch connected to digital pin 3
-int switch3Pin = 4;  // Switch connected to digital pin 4
-int switch4Pin = 5;  // Switch connected to digital pin 5
+int switch3Pin = 4;   // Switch connected to digital pin 4
 
 // LEDs Pin Declaration
 int LEDPin = 13;
@@ -23,6 +22,9 @@ int stage = 0;
 int InitialPosServo1 = 15;
 int InitialPosServo2 = 90;
 
+// Constant time durations
+unsigned long TwoMinutes = 60000;
+
 void setup() {
   Serial.begin(9600);
 
@@ -30,7 +32,6 @@ void setup() {
   pinMode(switch1Pin, INPUT);
   pinMode(switch2Pin, INPUT);
   pinMode(switch3Pin, INPUT);
-  pinMode(switch4Pin, INPUT);
 
   // Attach servos to pins
   servo1.attach(9);
@@ -66,6 +67,11 @@ void loop() {
         reset();
       }
       break;
+    case 3:
+      swanMoving();
+      stage++;
+      reset();
+      break;
     default:
       reset();
       break;
@@ -75,7 +81,7 @@ void loop() {
 void reset() {
   servo1.write(InitialPosServo1);
   servo2.write(InitialPosServo2);
-  servo3.write(90);
+  servo3.write(0);
   servo4.write(0);
   digitalWrite(LEDPin, LOW);
 }
@@ -111,6 +117,19 @@ void turnOnLED(bool state) {
     Serial.println("LED On");
     digitalWrite(LEDPin, LOW);
   }
-  delay(TwoMinutes);  // delay for 2 minutes
+  delay(TwoMinutes); // delay for 2 minutes
   stage++;
 }
+void swanMoving() {
+  servo3.write(0);
+  for (float pos = 0; pos <= 45; pos += 0.4) {  // goes from 0 degrees to 45 degrees
+    // in steps of 1 degree
+    servo3.write(pos);  // tell servo to go to position in variable 'pos'
+    delay(5);           // waits 5 ms for the servo to reach the position
+  }
+  for (float pos = 45; pos >= 0; pos -= 0.4) {  // goes from 45 degrees to 0 degrees
+    servo3.write(pos);                          // tell servo to go to position in variable 'pos'
+    delay(5);                                   // waits 5 ms for the servo to reach the position
+  }
+}
+
