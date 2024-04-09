@@ -17,13 +17,18 @@ int LEDPin = 13;
 //Variable to track the stage of the enclosure
 int stage = 0;
 
-
 // Variable to store the initial position of each servo
 int InitialPosServo1 = 15;
 int InitialPosServo2 = 90;
+int InitialPosServo4 = 0;
 
 // Constant time durations
 unsigned long TwoMinutes = 60000;
+
+// Specific variables for the reveal character method
+int prevState = 0;  // Variable to save the switch 3 state
+bool canMove = true;
+int elapsedTime; // Variable to store the elapsed time
 
 void setup() {
   Serial.begin(9600);
@@ -62,7 +67,6 @@ void loop() {
       break;
     case 2:
       if (digitalRead(switch2Pin) == LOW) {
-        Serial.println("im in stage 3");
         turnOnLED(true);
         reset();
       }
@@ -71,6 +75,15 @@ void loop() {
       swanMoving();
       stage++;
       reset();
+      break;
+    case 4:
+      if (digitalRead(switch3Pin) == HIGH) {
+        RevealCharacter();
+        reset();
+      }else if(canMove){
+        swanMoving();
+        reset();
+      }
       break;
     default:
       reset();
@@ -82,7 +95,7 @@ void reset() {
   servo1.write(InitialPosServo1);
   servo2.write(InitialPosServo2);
   servo3.write(0);
-  servo4.write(0);
+  servo4.write(InitialPosServo4);
   digitalWrite(LEDPin, LOW);
 }
 
@@ -133,3 +146,28 @@ void swanMoving() {
   }
 }
 
+void RevealCharacter() {
+  unsigned long startTime = millis();
+  elapsedTime = millis() - startTime;  // Calculate elapsed time
+
+  if (canMove) {
+    // Wobble the servo for 10 seconds
+    while (elapsedTime < 10000) {
+      elapsedTime = millis() - startTime;  // Update elapsed time
+      if (prevState == 0) {
+        InitialPosServo4 += 6;  // Increase servo position
+        prevState++;
+      } else {
+        InitialPosServo4 -= 6;  // Decrease servo position
+        prevState--;
+      }
+      servo4.write(InitialPosServo4);  // Move the servo to the new position
+    }
+
+    if (canMove) {
+      InitialPosServo4 = 0;
+      servo4.write(InitialPosServo4);
+      canMove = false;
+    }
+  }
+}
