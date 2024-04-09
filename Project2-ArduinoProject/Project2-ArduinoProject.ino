@@ -9,8 +9,8 @@ Servo servo4;
 // Switches Declaration
 int switch1Pin = 2;  // Switch connected to digital pin 2
 int switch2Pin = 3;  // Switch connected to digital pin 3
-int switch3Pin = 4;   // Switch connected to digital pin 4
-int switch4Pin = 5;   // Switch connected to digital pin 5
+int switch3Pin = 4;  // Switch connected to digital pin 4
+int switch4Pin = 5;  // Switch connected to digital pin 5
 
 // LEDs Pin Declaration
 int LEDPin = 13;
@@ -44,6 +44,7 @@ void setup() {
 }
 
 void loop() {
+
   switch (stage) {
     case 0:
       if (digitalRead(switch1Pin) == HIGH) {
@@ -58,7 +59,13 @@ void loop() {
         reset();
       }
       break;
-  
+    case 2:
+      if (digitalRead(switch2Pin) == LOW) {
+        Serial.println("im in stage 3");
+        turnOnLED(true);
+        reset();
+      }
+      break;
     default:
       reset();
       break;
@@ -94,5 +101,16 @@ void ShowSpeechBubble() {
     delay(5);
   }
   InitialPosServo2 = 0;
+  stage++;
+}
+void turnOnLED(bool state) {
+  if (state) {
+    Serial.println("LED On");
+    digitalWrite(LEDPin, HIGH);
+  } else {
+    Serial.println("LED On");
+    digitalWrite(LEDPin, LOW);
+  }
+  delay(TwoMinutes);  // delay for 2 minutes
   stage++;
 }
