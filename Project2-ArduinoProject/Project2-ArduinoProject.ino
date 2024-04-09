@@ -7,8 +7,8 @@ Servo servo3;
 Servo servo4;
 
 // Switches Declaration
-int switch1Pin = 2;   // Switch connected to digital pin 2
-int switch2Pin = 3;   // Switch connected to digital pin 3
+int switch1Pin = 2;  // Switch connected to digital pin 2
+int switch2Pin = 3;  // Switch connected to digital pin 3
 int switch3Pin = 4;   // Switch connected to digital pin 4
 int switch4Pin = 5;   // Switch connected to digital pin 5
 
@@ -21,6 +21,7 @@ int stage = 0;
 
 // Variable to store the initial position of each servo
 int InitialPosServo1 = 15;
+int InitialPosServo2 = 90;
 
 void setup() {
   Serial.begin(9600);
@@ -50,6 +51,14 @@ void loop() {
         reset();
       }
       break;
+    case 1:
+      if (digitalRead(switch2Pin) == HIGH) {
+        ShowSpeechBubble();
+        servo1.detach();
+        reset();
+      }
+      break;
+  
     default:
       reset();
       break;
@@ -58,7 +67,7 @@ void loop() {
 
 void reset() {
   servo1.write(InitialPosServo1);
-  servo2.write(0);
+  servo2.write(InitialPosServo2);
   servo3.write(90);
   servo4.write(0);
   digitalWrite(LEDPin, LOW);
@@ -74,5 +83,16 @@ void HatchingEggs() {
     delay(5);
   }
   InitialPosServo1 = 90;
+  stage++;
+}
+
+// This function flips the attached Speech Bubble perpendicular by moving the servo
+void ShowSpeechBubble() {
+  servo2.write(InitialPosServo2);
+  for (int pos = 90; pos >= 0; pos -= 1) {
+    servo2.write(pos);
+    delay(5);
+  }
+  InitialPosServo2 = 0;
   stage++;
 }
