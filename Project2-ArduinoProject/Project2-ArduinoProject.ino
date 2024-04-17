@@ -18,12 +18,19 @@ int LEDPin = 13;
 int stage = 0;
 
 // Variable to store the initial position of each servo
+<<<<<<< Updated upstream
 int InitialPosServo1 = 15;
 int InitialPosServo2 = 90;
 int InitialPosServo4 = 0;
 
 // Constant time durations
 unsigned long TwoMinutes = 3000;
+=======
+int InitialPosServo1,InitialPosServo2,InitialPosServo3,InitialPosServo4;
+
+// Constant time durations
+unsigned long LEDTimer = 7000;
+>>>>>>> Stashed changes
 
 // Specific variables for the reveal character method
 int prevState = 0;  // Variable to save the switch 3 state
@@ -46,7 +53,7 @@ void setup() {
 
   // Configure LED pin as output
   pinMode(LEDPin, OUTPUT);
-  reset();
+  initialization();
 }
 
 void loop() {
@@ -90,13 +97,24 @@ void loop() {
       break;
   }
 }
+void initialization(){
+  InitialPosServo1 = 15;
+  InitialPosServo2 = 90;
+  InitialPosServo3 = 0;
+  InitialPosServo4 = 0;
+  reset();
 
+}
 void reset() {
   servo1.write(InitialPosServo1);
   servo2.write(InitialPosServo2);
-  servo3.write(0);
+  servo3.write(InitialPosServo3);
   servo4.write(InitialPosServo4);
   digitalWrite(LEDPin, LOW);
+  if(stage >4){
+    stage = 0;
+    initialization();
+  }
 }
 
 // This function simulate the hatching egg process by gradually moving the upper part of the egg
@@ -134,7 +152,7 @@ void turnOnLED(bool state) {
   stage++;
 }
 void swanMoving() {
-  servo3.write(0);
+  servo3.write(InitialPosServo3);
   for (float pos = 0; pos <= 45; pos += 0.4) {  // goes from 0 degrees to 45 degrees
     // in steps of 1 degree
     servo3.write(pos);  // tell servo to go to position in variable 'pos'
@@ -161,13 +179,15 @@ void RevealCharacter() {
         InitialPosServo4 -= 6;  // Decrease servo position
         prevState--;
       }
-      servo4.write(InitialPosServo4);  // Move the servo to the new position
+      servo4.write(InitialPosServo4);  // Move the servo to the new positio
     }
 
     if (canMove) {
       InitialPosServo4 = 0;
       servo4.write(InitialPosServo4);
       canMove = false;
+       stage++;
+       reset();
     }
   }
 }
