@@ -23,7 +23,7 @@ int InitialPosServo2 = 90;
 int InitialPosServo4 = 0;
 
 // Constant time durations
-unsigned long TwoMinutes = 120000;
+unsigned long TwoMinutes = 3000;
 
 // Specific variables for the reveal character method
 int prevState = 0;  // Variable to save the switch 3 state
