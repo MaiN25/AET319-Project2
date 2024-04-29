@@ -12,18 +12,19 @@ int switch2Pin = 3;  // Switch connected to digital pin 3
 int switch3Pin = 4;   // Switch connected to digital pin 4
 
 // LEDs Pin Declaration
-int LEDPin = 13;
+int LED1Pin = 13;
+int LED2Pin = 8;
 
 //Variable to track the stage of the enclosure
 int stage = 0;
 
-// Variable to store the initial position of each servo
-int InitialPosServo1 = 15;
-int InitialPosServo2 = 90;
-int InitialPosServo4 = 0;
 
 // Constant time durations
 unsigned long TwoMinutes = 3000;
+int InitialPosServo1,InitialPosServo2,InitialPosServo3,InitialPosServo4;
+
+// Constant time durations
+unsigned long LEDTimer = 7000;
 
 // Specific variables for the reveal character method
 int prevState = 0;  // Variable to save the switch 3 state
@@ -45,8 +46,10 @@ void setup() {
   servo4.attach(12);
 
   // Configure LED pin as output
-  pinMode(LEDPin, OUTPUT);
-  reset();
+  pinMode(LED1Pin, OUTPUT);
+  pinMode(LED2Pin, OUTPUT);
+
+  initialization();
 }
 
 void loop() {
@@ -90,13 +93,26 @@ void loop() {
       break;
   }
 }
+void initialization(){
+  InitialPosServo1 = 15;
+  InitialPosServo2 = 145;
+  InitialPosServo3 = 0;
+  InitialPosServo4 = 0;
+  reset();
 
+}
 void reset() {
   servo1.write(InitialPosServo1);
   servo2.write(InitialPosServo2);
-  servo3.write(0);
+  servo3.write(InitialPosServo3);
   servo4.write(InitialPosServo4);
-  digitalWrite(LEDPin, LOW);
+  digitalWrite(LED1Pin, LOW);
+  digitalWrite(LED2Pin, LOW);
+
+  if(stage >4){
+    stage = 0;
+    initialization();
+  }
 }
 
 // This function simulate the hatching egg process by gradually moving the upper part of the egg
@@ -115,26 +131,26 @@ void HatchingEggs() {
 // This function flips the attached Speech Bubble perpendicular by moving the servo
 void ShowSpeechBubble() {
   servo2.write(InitialPosServo2);
-  for (int pos = 90; pos >= 0; pos -= 1) {
+  for (int pos = InitialPosServo2; pos >= 55; pos -= 1) {
     servo2.write(pos);
     delay(5);
   }
-  InitialPosServo2 = 0;
+  InitialPosServo2 = 55;
   stage++;
 }
 void turnOnLED(bool state) {
   if (state) {
     Serial.println("LED On");
-    digitalWrite(LEDPin, HIGH);
+    digitalWrite(LED1Pin, HIGH);
   } else {
     Serial.println("LED On");
-    digitalWrite(LEDPin, LOW);
+    digitalWrite(LED1Pin, LOW);
   }
   delay(TwoMinutes); // delay for 2 minutes
   stage++;
 }
 void swanMoving() {
-  servo3.write(0);
+  servo3.write(InitialPosServo3);
   for (float pos = 0; pos <= 45; pos += 0.4) {  // goes from 0 degrees to 45 degrees
     // in steps of 1 degree
     servo3.write(pos);  // tell servo to go to position in variable 'pos'
@@ -161,13 +177,16 @@ void RevealCharacter() {
         InitialPosServo4 -= 6;  // Decrease servo position
         prevState--;
       }
-      servo4.write(InitialPosServo4);  // Move the servo to the new position
+      digitalWrite(LED2Pin, HIGH);
+      servo4.write(InitialPosServo4);  // Move the servo to the new positio
     }
 
     if (canMove) {
       InitialPosServo4 = 0;
       servo4.write(InitialPosServo4);
       canMove = false;
+       stage++;
+       reset();
     }
   }
 }
